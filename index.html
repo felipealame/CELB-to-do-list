@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>To Do List</title>
+    </head>
+
+    <body>
+        <style>
+            a{
+                color: red;
+                text-decoration: none;
+            }
+        </style>
+
+        <!-- Div principal para alinhar tudo -->
+        <div id="app" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+
+            <h1 style="font-family: monospace;">My To Do List</h1>
+            <!-- Div para alinhar o input e button -->
+            <div style="display: flex; flex-direction: row;">
+                <input type="text" placeholder="Digite um TODO"/>
+                <button>Adicionar</button>
+            </div>
+            <!-- ul para receber os lis -->
+            <ul style="list-style: decimal; font-family: monospace; font-size: 16px; font-weight: bold;"></ul>
+
+        </div>
+
+        <script>
+
+            // Capturando ul, inupt e button do div
+            let ulElement = document.querySelector('#app ul');
+            let inputElement = document.querySelector('#app input')
+            let buttonElement = document.querySelector('#app button')
+
+            // Criação da tarefas para armazenar os dados localmente sem os perder
+            let tarefas = JSON.parse(localStorage.getItem('Lista de tarefas')) || [];
+
+            // onClick para acionar a função addTODO
+            buttonElement.onclick = addTODO;
+
+            // função para adicionar um item
+            function addTODO() {
+                let inputText = inputElement.value;
+                //validação se o campo não está vazio
+                if( inputText !== "") {
+                    //captura em inputText o valor que está vindo do input
+                    tarefas.push(inputText);
+                    inputElement.value = '';
+                    renderTODO();
+                    saveToStorage();
+                }else{
+                    alert('Cannot insert an empty To Do');
+                }
+            }
+
+            // chamada na função renderTODO pois caso seja atualizada a página, não aparece nada até que seja cadastrado alguma tarefa pois dentro da função possui um renderTODO
+            renderTODO();
+            
+            // função para deletar o item clicado da lista
+            function deleteTODO(position) {
+                tarefas.splice(position, 1); // Remove da posição determinada 1 elemento
+                renderTODO();
+                saveToStorage();
+            }
+
+
+            function renderTODO() {
+
+                // Necessário, pois sem por vazio ele vai pegar as outras informações e renderizar repetido os valores já cadastrados na exclusão ou para adicionar
+                ulElement.innerHTML = ''; 
+
+                //Para percorrer o tarefas que armazena os dados da To Do List
+                for (tarefa of tarefas) { // Criando a li para ser alocada dentro da ul
+                    let liElement = document.createElement('li');
+                    let todoText = document.createTextNode(tarefa);
+
+                    // Criando a opção de exclusão do item da lista
+                    let linkElement = document.createElement('a');
+                    let linkText = document.createTextNode(' Excluir');
+                    linkElement.setAttribute('href', '#');
+                    let position = tarefas.indexOf(tarefa);
+                    // Aqui é necessário para quando for realizado um clique seja chamada a função deleteTODO
+                    linkElement.addEventListener('click', () => deleteTODO(position));
+
+                    // Realizando o appendChild em tudo
+                    linkElement.appendChild(linkText);
+                    liElement.appendChild(todoText);
+                    liElement.appendChild(linkElement);
+                    ulElement.appendChild(liElement);
+                }
+            }
+
+            // função para armazenar o item na localStorage
+            function saveToStorage() {
+                JSON
+                localStorage.setItem('Lista de tarefas', JSON.stringify(tarefas));
+            }
+        </script>
+    </body>
+
+</html>
